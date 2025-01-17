@@ -36,7 +36,11 @@ async fn main() -> eyre::Result<()> {
 
     let ws = WsConnect::new(rpc_url);
 
-    let provider = ProviderBuilder::new().wallet(wallet).on_ws(ws).await?;
+    let provider = ProviderBuilder::new()
+        .with_recommended_fillers()
+        .wallet(wallet)
+        .on_ws(ws)
+        .await?;
 
     let filter = Filter::new()
         .topic2(topic2)
