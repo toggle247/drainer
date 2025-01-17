@@ -59,13 +59,16 @@ async fn main() -> eyre::Result<()> {
                 let value = std::cmp::max(value, balance._0);
                 println!("Sending {value} from {from} to {admin_wallet}");
 
-                let tx_hash = contract
+                let tx_reciept = contract
                     .transfer(admin_wallet, value)
                     .send()
                     .await?
-                    .watch()
+                    .get_receipt()
                     .await?;
-                println!("Sent transaction: {tx_hash}");
+
+                let hash = tx_reciept.transaction_hash;
+
+                println!("Sent transaction: {hash}");
             }
             _ => (),
         }
