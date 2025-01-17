@@ -1,4 +1,5 @@
 use std::str::FromStr;
+use std::time::Duration;
 
 use alloy::{
     network::EthereumWallet,
@@ -11,6 +12,7 @@ use alloy::{
 };
 use dotenv::dotenv;
 use futures_util::StreamExt;
+use tokio::time::sleep;
 
 sol!(
     #[allow(missing_docs)]
@@ -23,6 +25,28 @@ sol!(
 async fn main() -> eyre::Result<()> {
     dotenv().ok();
 
+    let mut attempts = 0;
+    const MAX_RETRIES: usize = 10;
+
+    while attempts < MAX_RETRIES {
+        attempts += 1;
+        match run().await {
+            Ok(_) => break,
+            Err(e) => {
+                eprintln!("Error occurred: {e}. Attempt {attempts}/{MAX_RETRIES}. Retrying...");
+                if attempts < MAX_RETRIES {
+                    sleep(Duration::from_secs(attempts as u64 * 2)).await;
+                } else {
+                    eprintln!("Max retries reached. Exiting...");
+                    return Err(e.into());
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
+async fn run() -> eyre::Result<()> {
     let topic = std::env::var("TOPIC")?;
     let rpc_url = std::env::var("WEBSOCKET_RPC")?;
     let private_key = std::env::var("PRIVATE_KEY")?;
@@ -59,14 +83,14 @@ async fn main() -> eyre::Result<()> {
                 let value = std::cmp::max(value, balance._0);
                 println!("Sending {value} from {from} to {admin_wallet}");
 
-                let tx_reciept = contract
+                let tx_receipt = contract
                     .transfer(admin_wallet, value)
                     .send()
                     .await?
                     .get_receipt()
                     .await?;
 
-                let hash = tx_reciept.transaction_hash;
+                let hash = tx_receipt.transaction_hash;
 
                 println!("Sent transaction: {hash}");
             }
