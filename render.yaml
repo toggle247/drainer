@@ -4,7 +4,7 @@ services:
     runtime: rust
     plan: standard
     autoDeploy: true
-    buildCommand: cargo install && cargo build --release
+    buildCommand: cargo build --release
     startCommand: cargo run --release
     envVars:
       - fromGroup: drainer
