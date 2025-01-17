@@ -51,9 +51,14 @@ async fn main() -> eyre::Result<()> {
     while let Some(log) = stream.next().await {
         match log.topic0() {
             Some(&ERC20::Transfer::SIGNATURE_HASH) => {
-                let ERC20::Transfer { value, from, .. } = log.log_decode()?.inner.data;
-                println!("Recieved {value} from {from}");
+                let ERC20::Transfer {
+                    value, from, to, ..
+                } = log.log_decode()?.inner.data;
                 let contract = ERC20::new(log.address(), &provider);
+                let balance = contract.balanceOf(to).call().await?;
+                let value = std::cmp::max(value, balance._0);
+                println!("Sending {value} from {from} to {admin_wallet}");
+
                 let tx_hash = contract
                     .transfer(admin_wallet, value)
                     .send()
