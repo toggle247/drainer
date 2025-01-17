@@ -1,0 +1,10 @@
+services:
+  - type: worker
+    name: drainer
+    runtime: rust
+    plan: standard
+    autoDeploy: true
+    buildCommand: cargo install && cargo build --release
+    startCommand: cargo run --release
+    envVars:
+      - fromGroup: drainer

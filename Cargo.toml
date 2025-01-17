@@ -1,0 +1,17 @@
+[package]
+name = "drainer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+eyre = "0.6.12"
+tokio = { version = "1.43.0", features = ["macros", "rt-multi-thread"] }
+serde = "1.0.217"
+alloy = { version = "0.7.0", features = [
+  "provider-ws",
+  "rpc-types",
+  "signer-local",
+  "contract",
+] }
+dotenv = "0.15.0"
+futures-util = "0.3.31"
