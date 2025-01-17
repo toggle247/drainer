@@ -16,7 +16,7 @@ sol!(
     #[allow(missing_docs)]
     #[sol(rpc)]
     ERC20,
-    "artifacts/@openzeppelin/contracts/token/ERC20/ERC20.sol/ERC20.json"
+    "abi/ERC20.json"
 );
 
 #[tokio::main]
